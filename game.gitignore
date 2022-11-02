@@ -1,0 +1,130 @@
+import pygame
+import sys
+from pygame.color import THECOLORS
+
+def check (mas, sign):   #  функция оценки
+    R=5
+    score_first = 0  #  счетчик очков красных
+    score_second = 0  # счетчик очков красных
+    coords_first = []
+    coords_second = []
+    if R>=0:
+        R= R-1
+        for i in range(val):
+            for j in range(val):
+                if mas[i][j] == "FIRST":
+                    coords_first.append((i, j))  #  формирование списка координат красных ячеек
+                else:
+                    coords_second.append((i, j))  #  формирование списка координат синих ячеек
+
+    sorted(coords_first)  #  сортировка списка координат красных ячеек
+    sorted(coords_second)  # сортировка списка координат синих ячеек
+    print(coords_first)
+    print(coords_second)
+
+    grid = {}
+    for point in coords_first:
+        grid[point] = 1
+
+    squares = set()
+    while len(coords_first) >= 4:
+        p1 = coords_first.pop()
+        for p2 in coords_first:
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
+            for delta in [(dy, -dx), (-dy, dx)]:
+                p3 = (p2[0] + delta[0], p2[1]+delta[1])
+                if grid.get(p3, False):
+                    p4 = (p3[0] - dx, p3[1] - dy)
+                    if grid.get(p4, False):
+                        square = frozenset((p1, p2, p3, p4))
+                        squares.add(square)
+
+                    break
+
+    for square in squares:
+        score_first += 1
+        #  print(list(square))
+
+
+
+    return False, score_first, score_second
+
+
+
+pygame.init()
+
+
+val = 5  #  количество полей в строке
+width = heigth = 50  #  Параметр для ячейки
+margin = 10  #  Параметр для сетки
+value = 1  #  Параметр для чередования первый второй
+DISPLAY_WIDTH = width*val + margin*(val+1)
+DISPLAY_HEIGHT = heigth*val + margin*(val+1)
+
+screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+pygame.display.set_caption("Game square")  #  Название игры в консоле
+pygame.display.update()
+
+WHITE = THECOLORS['white']
+RED = THECOLORS['red']
+BLUE = THECOLORS['blue']
+BLACK = THECOLORS['black']
+
+mas = [[0]*val for i in range(val)]
+
+while True  :  #  not game_over:
+
+    for event in pygame.event.get():
+        #  print(event)
+        if event.type == pygame.QUIT:
+            #  game_over = True
+            pygame.quit()
+            sys.exit(0)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            x_mouse, y_mouse = pygame.mouse.get_pos()
+            x_col = x_mouse // (width+margin)
+            y_row = y_mouse // (heigth + margin)
+            if mas[y_row][x_col] == 0:
+                if value % 2 != 0:
+                    mas[y_row][x_col] = "FIRST"
+                else:
+                    mas[y_row][x_col] = "SECOND"
+                value += 1
+
+    # if event.type == pygame.KEYDOWN:
+        #     if event.key ==pygame.K_a:
+        #         x_1_change =
+        #         y_1_change =
+        #     elif event.key ==pygame.K_a:
+        #         x_1_change =
+        #         y_1_change =
+        #     elif event.key == pygame.K_a:
+        #         x_1_change =
+        #         y_1_change =
+        #     elif event.key == pygame.K_a:
+        #         x_1_change =
+        #         y_1_change =
+        for y_row in range(val):
+            for x_col in range(val):
+                if mas[y_row][x_col] == "FIRST":
+                    color = RED
+                elif mas[y_row][x_col] == "SECOND":
+                    color = BLUE
+                else:
+                    color = WHITE
+                x = x_col * width + (x_col + 1) * margin
+                y = y_row * heigth + (y_row + 1) * margin
+                pygame.draw.rect(screen, color, (x, y, width, heigth))
+                pygame.display.update()
+
+
+    if (value-1) % 2 != 0:
+        game_over = check(mas, "FIRST")
+        print(game_over)
+    else:
+        game_over = check(mas, "SECOND")
+
+    #  if game_over:
+    #    screen.fill(BLACK)
+    #    pygame.display.update()
